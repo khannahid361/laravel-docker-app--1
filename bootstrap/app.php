@@ -1,5 +1,6 @@
 <?php
 
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -31,4 +32,17 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 429);
             }
         });
+
+        // Authorization
+    $exceptions->render(function (
+        AccessDeniedHttpException $e,
+        Request $request
+    ) {
+        if ($request->is('api/*')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not authorized to perform this action.',
+            ], 403);
+        }
+    });
     })->create();
