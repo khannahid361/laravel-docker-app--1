@@ -1,47 +1,42 @@
-﻿<?php
+<?php
 
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\RegisterRequest;
-use App\Repositories\Authentication\UserAuthenticationRepositoryInterface;
-use Illuminate\Support\Facades\Hash;
+use App\Services\UserAuthenticationService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-   public function __construct(
-        private UserAuthenticationRepositoryInterface $authRepository
+    public function __construct(
+        protected UserAuthenticationService $authService
     ) {}
 
-    public function register(RegisterRequest $request)
+    public function register(RegisterRequest $request): JsonResponse
     {
         $data = $request->validated();
 
-        $user = $this->authRepository->register($data);
-        
-        $token = $user->createToken('authToken')->accessToken;
+        $result = $this->authService->register($data);
 
         return response()->json([
             'success' => true,
             'message' => 'Registration successful',
-            'data' => [
-                'user' => $user,
-                'token' => $token,
-            ]
+            'data' => $result
         ], 201);
     }
 
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required|string',
         ]);
 
-        $user = $this->authRepository->login($credentials);
+        $result = $this->authService->login($credentials);
 
-        if (!$user) {
+        if (!$result) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid credentials',
@@ -49,15 +44,10 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $token = $user->createToken('authToken')->accessToken;
-
         return response()->json([
             'success' => true,
             'message' => 'Login successful',
-            'data' => [
-                'user' => $user,
-                'token' => $token,
-            ]
+            'data' => $result
         ]);
     }
 }
