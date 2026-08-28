@@ -7,6 +7,7 @@ use App\Http\Requests\Api\StorePostRequest;
 use App\Http\Requests\Api\UpdatePostRequest;
 use App\Http\Resources\PostResource;
 use App\Services\PostService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 
@@ -16,7 +17,7 @@ class PostController extends Controller
         protected PostService $postService
     ) {}
 
-    public function index()
+    public function index(): JsonResponse
     {
         $posts = $this->postService->getAllPosts();
 
@@ -27,7 +28,7 @@ class PostController extends Controller
         ]);
     }
 
-    public function show(int $id)
+    public function show(int $id): JsonResponse
     {
         $post = $this->postService->getPostById($id);
 
@@ -38,7 +39,7 @@ class PostController extends Controller
         ]);
     }
 
-    public function store(StorePostRequest $request)
+    public function store(StorePostRequest $request): JsonResponse
     {
         $data = $request->validated();
         $data['user_id'] = $request->user()->id;
@@ -52,7 +53,7 @@ class PostController extends Controller
         ], 201);
     }
 
-    public function update(UpdatePostRequest $request, int $id)
+    public function update(UpdatePostRequest $request, int $id): JsonResponse
     {
         $post = $this->postService->getPostById($id);
 
@@ -68,7 +69,7 @@ class PostController extends Controller
         ]);
     }
 
-    public function destroy(int $id)
+    public function destroy(int $id): JsonResponse
     {
         $post = $this->postService->getPostById($id);
 

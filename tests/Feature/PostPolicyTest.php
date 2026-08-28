@@ -34,4 +34,18 @@ class PostPolicyTest extends TestCase
             'message' => 'You are not authorized to perform this action.',
         ]);
     }
+
+    public function test_get_non_existent_post_returns_custom_404()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user, 'api')
+            ->getJson("/api/posts/9999");
+
+        $response->assertStatus(404);
+        $response->assertJson([
+            'success' => false,
+            'message' => 'Resource/Data not found.',
+        ]);
+    }
 }

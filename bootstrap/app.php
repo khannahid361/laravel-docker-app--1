@@ -1,5 +1,6 @@
 <?php
 
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -34,15 +35,27 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         // Authorization
-    $exceptions->render(function (
-        AccessDeniedHttpException $e,
-        Request $request
-    ) {
-        if ($request->is('api/*')) {
-            return response()->json([
-                'success' => false,
-                'message' => 'You are not authorized to perform this action.',
-            ], 403);
-        }
-    });
+        $exceptions->render(function (
+            AccessDeniedHttpException $e,
+            Request $request
+        ) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not authorized to perform this action.',
+                ], 403);
+            }
+        });
+
+        $exceptions->render(function (
+            NotFoundHttpException $e,
+            Request $request
+        ) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Resource/Data not found.',
+                ], 404);
+            }
+        });
     })->create();

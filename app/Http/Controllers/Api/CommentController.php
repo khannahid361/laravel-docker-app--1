@@ -9,7 +9,6 @@ use App\Http\Resources\CommentResource;
 use App\Services\CommentService;
 use App\Services\PostService;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
@@ -36,6 +35,7 @@ class CommentController extends Controller
     {
         // Verify post exists
         $this->postService->getPostById($postId);
+
 
         $data = $request->validated();
         $data['post_id'] = $postId;
